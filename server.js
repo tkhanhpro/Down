@@ -3,9 +3,7 @@ const express = require('express');
 const axios = require('axios');
 const NodeCache = require('node-cache');
 const rateLimit = require('express-rate-limit');
-const fs = require('fs');
 const path = require('path');
-const { v4: uuidv4 } = require('uuid');
 
 // In-memory cache for resolved URLs (TTL: 1 hour)
 const urlCache = new NodeCache({ stdTTL: 3600, checkperiod: 600 });
@@ -67,18 +65,6 @@ const platformPatterns = [
     { name: "Izlesene", pattern: /(izlesene\.com)/i, displayName: "Izlesene" },
     { name: "Reddit", pattern: /(reddit\.com|redd\.it)/i, displayName: "Reddit" }
 ];
-
-// Load API keys from file
-const apiKeysFile = './apikeys.json';
-let apiKeys = {};
-if (fs.existsSync(apiKeysFile)) {
-    apiKeys = JSON.parse(fs.readFileSync(apiKeysFile, 'utf8'));
-}
-
-// Function to save API keys
-function saveApiKeys() {
-    fs.writeFileSync(apiKeysFile, JSON.stringify(apiKeys, null, 2));
-}
 
 // Function to fetch data from FSMVID API
 async function fetchMediaData(url) {
@@ -145,82 +131,30 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from 'public' folder
 
-// Rate limiter: 10 requests per 2 minutes per IP
+// Rate limiter: 5 requests per minute per IP
 const limiter = rateLimit({
-    windowMs: 2 * 60 * 1000,
-    limit: 10,
+    windowMs: 60 * 1000,
+    limit: 5,
     standardHeaders: 'draft-7',
     legacyHeaders: false,
     keyGenerator: (req) => req.ip,
     handler: (req, res) => {
-        res.status(429).json({ error: true, message: 'Rate limit exceeded: 10 requests per 2 minutes' });
+        res.status(429).json({ error: true, message: 'Rate limit exceeded: 5 requests per minute' });
     }
 });
 
 // Apply rate limiter to /download
 app.use('/download', limiter);
 
-// Endpoint to get API key based on IP
-app.get('/get-apikey', (req, res) => {
-    const ip = req.ip;
-    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
-
-    if (!apiKeys[ip]) {
-        apiKeys[ip] = {
-            apikey: uuidv4(),
-            usage: 0,
-            lastMonth: currentMonth
-        };
-        saveApiKeys();
-    }
-
-    let keyInfo = apiKeys[ip];
-    if (keyInfo.lastMonth !== currentMonth) {
-        keyInfo.usage = 0;
-        keyInfo.lastMonth = currentMonth;
-        saveApiKeys();
-    }
-
-    res.json({ apikey: keyInfo.apikey });
-});
-
 // API endpoint to fetch media data
 app.get('/download', async (req, res) => {
     const url = req.query.url;
-    const apikey = req.query.apikey;
-
     if (!url) {
         return res.status(400).json({ error: true, message: 'Missing URL parameter' });
     }
 
-    if (!apikey) {
-        return res.status(400).json({ error: true, message: 'Missing APIKEY parameter' });
-    }
-
-    const ip = req.ip;
-    const currentMonth = new Date().toISOString().slice(0, 7);
-
-    if (!apiKeys[ip] || apiKeys[ip].apikey !== apikey) {
-        return res.status(401).json({ error: true, message: 'Invalid API key for this IP' });
-    }
-
-    let keyInfo = apiKeys[ip];
-    if (keyInfo.lastMonth !== currentMonth) {
-        keyInfo.usage = 0;
-        keyInfo.lastMonth = currentMonth;
-    }
-
-    if (keyInfo.usage >= 500) {
-        return res.status(429).json({ error: true, message: 'API key usage limit exceeded (500 requests per month). Please use a different network or device to obtain a new API key.' });
-    }
-
-    // Increment usage before fetching (to count the request)
-    keyInfo.usage++;
-    saveApiKeys();
-
     const result = await fetchMediaData(url);
     if (result.error) {
-        // If error, still count the usage, but return error
         return res.status(500).json(result);
     }
     res.json(result);
