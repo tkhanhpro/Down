@@ -1,12 +1,18 @@
 /* public/styles.css */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
+    from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
 body {
-    font-family: Arial, sans-serif;
-    background: linear-gradient(to bottom, #e0f7fa, #fff);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #ff9a9e 0%, #fad0c4 99%, #fad0c4 100%);
     margin: 0;
     padding: 0;
     display: flex;
@@ -17,28 +23,30 @@ body {
 }
 
 .container {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
     padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     width: 90%;
-    max-width: 700px;
+    max-width: 500px;
     text-align: center;
-    animation: fadeIn 1s ease-in-out;
+    animation: fadeIn 0.8s ease-out;
 }
 
-h1 {
-    color: #4caf50;
-    font-size: 2em;
+.title {
+    color: #ff758c;
+    font-size: 2.2em;
     margin-bottom: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-p {
-    color: #555;
+.subtitle {
+    color: #666;
     font-size: 1.1em;
+    margin-bottom: 20px;
 }
 
-form {
+.form {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -46,61 +54,77 @@ form {
 
 input[type="text"] {
     width: 100%;
-    padding: 12px;
+    padding: 12px 15px;
     margin: 10px 0;
-    border: 2px solid #ddd;
-    border-radius: 8px;
+    border: 2px solid #ff9a9e;
+    border-radius: 10px;
     font-size: 1em;
-    transition: border-color 0.3s;
+    transition: border-color 0.3s, box-shadow 0.3s;
+    background: #fff;
 }
 
 input[type="text"]:focus {
-    border-color: #4caf50;
+    border-color: #ff758c;
+    box-shadow: 0 0 10px rgba(255, 117, 140, 0.3);
     outline: none;
 }
 
-button {
-    padding: 12px 24px;
-    background: linear-gradient(to right, #4caf50, #66bb6a);
+.btn {
+    padding: 12px 25px;
+    background: linear-gradient(135deg, #ff758c 0%, #ff7eb3 100%);
     color: white;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     cursor: pointer;
     font-size: 1em;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    font-weight: bold;
+    transition: transform 0.3s, box-shadow 0.3s;
 }
 
-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+.btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255, 117, 140, 0.4);
+    animation: pulse 1s infinite;
 }
 
 .result {
-    margin-top: 20px;
+    margin-top: 25px;
     text-align: left;
     color: #333;
-    padding: 10px;
-    border-radius: 8px;
-    background: #f9f9f9;
+    padding: 15px;
+    border-radius: 15px;
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.05);
+    animation: fadeIn 0.5s ease-in;
+}
+
+.result h2 {
+    color: #ff758c;
+    font-size: 1.5em;
+    margin-bottom: 10px;
+}
+
+.result p {
+    margin: 5px 0;
+    font-size: 1em;
 }
 
 .result a {
-    display: block;
-    margin: 5px 0;
-    color: #2196f3;
+    display: inline-block;
+    margin: 8px 0;
+    padding: 8px 15px;
+    background: #ff9a9e;
+    color: white;
     text-decoration: none;
-    transition: color 0.2s;
+    border-radius: 8px;
+    transition: background 0.3s;
 }
 
 .result a:hover {
-    color: #1976d2;
-    text-decoration: underline;
+    background: #ff758c;
 }
 
 .error {
-    color: #f44336;
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-in-out;
+    color: #ff4d4d;
+    font-weight: bold;
 }
