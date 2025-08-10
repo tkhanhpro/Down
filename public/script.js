@@ -1,19 +1,4 @@
 // public/script.js
-let apiKey = '';
-
-async function loadApiKey() {
-    try {
-        const response = await fetch('/get-apikey');
-        const data = await response.json();
-        apiKey = data.apikey;
-        document.getElementById('apikeyDisplay').innerHTML = `Your API Key: ${apiKey} <br><small>(Use this for API calls; limited to 500 requests/month per IP)</small>`;
-    } catch (error) {
-        document.getElementById('apikeyDisplay').innerHTML = '<p class="error">Error loading API Key</p>';
-    }
-}
-
-document.addEventListener('DOMContentLoaded', loadApiKey);
-
 document.getElementById('urlForm').addEventListener('submit', async (event) => {
     event.preventDefault();
     const url = document.getElementById('urlInput').value;
@@ -22,7 +7,7 @@ document.getElementById('urlForm').addEventListener('submit', async (event) => {
     resultDiv.classList.remove('fade-in');
 
     try {
-        const response = await fetch(`/download?url=${encodeURIComponent(url)}&apikey=${encodeURIComponent(apiKey)}`);
+        const response = await fetch(`/download?url=${encodeURIComponent(url)}`);
         if (!response.ok) {
             throw new Error(await response.text());
         }
