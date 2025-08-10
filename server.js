@@ -2,7 +2,6 @@
 const express = require('express');
 const axios = require('axios');
 const NodeCache = require('node-cache');
-const rateLimit = require('express-rate-limit');
 const path = require('path');
 
 // In-memory cache for resolved URLs (TTL: 1 hour)
@@ -130,21 +129,6 @@ const port = process.env.PORT || 3000;
 
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from 'public' folder
-
-// Rate limiter: 5 requests per minute per IP
-const limiter = rateLimit({
-    windowMs: 60 * 1000,
-    limit: 5,
-    standardHeaders: 'draft-7',
-    legacyHeaders: false,
-    keyGenerator: (req) => req.ip,
-    handler: (req, res) => {
-        res.status(429).json({ error: true, message: 'Rate limit exceeded: 5 requests per minute' });
-    }
-});
-
-// Apply rate limiter to /download
-app.use('/download', limiter);
 
 // API endpoint to fetch media data
 app.get('/download', async (req, res) => {
