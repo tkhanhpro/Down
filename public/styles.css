@@ -38,12 +38,6 @@ p {
     font-size: 1.1em;
 }
 
-#apikeyDisplay {
-    font-weight: bold;
-    color: #2196f3;
-    margin-bottom: 20px;
-}
-
 form {
     display: flex;
     flex-direction: column;
